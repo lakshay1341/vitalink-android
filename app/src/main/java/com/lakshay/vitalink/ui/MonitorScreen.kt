@@ -35,9 +35,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,12 +42,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lakshay.vitalink.data.Alert
-import com.lakshay.vitalink.data.Backend
 import com.lakshay.vitalink.data.Encounter
-import com.lakshay.vitalink.data.LatestVital
 import com.lakshay.vitalink.data.News2Result
-import com.lakshay.vitalink.net.WaveformStomp
 import com.lakshay.vitalink.ui.theme.Bg
 import com.lakshay.vitalink.ui.theme.BpWhite
 import com.lakshay.vitalink.ui.theme.HrGreen
@@ -63,33 +59,21 @@ import com.lakshay.vitalink.ui.theme.RiskMedium
 import com.lakshay.vitalink.ui.theme.Spo2Cyan
 import com.lakshay.vitalink.ui.theme.TempOrange
 import com.lakshay.vitalink.ui.theme.Surface as SurfaceColor
-import kotlinx.coroutines.delay
+
+@Composable
+fun MonitorScreen(
+    enc: Encounter,
+    onBack: () -> Unit,
+    viewModel: MonitorViewModel = hiltViewModel(),
+) {
+    LaunchedEffect(enc.id) { viewModel.start(enc.id) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    MonitorContent(enc = enc, state = state, onBack = onBack)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MonitorScreen(enc: Encounter, onBack: () -> Unit) {
-    var wave by remember { mutableStateOf(DoubleArray(0)) }
-    var vitals by remember { mutableStateOf<List<LatestVital>>(emptyList()) }
-    var news2 by remember { mutableStateOf<News2Result?>(null) }
-    var alerts by remember { mutableStateOf<List<Alert>>(emptyList()) }
-    var streaming by remember { mutableStateOf(false) }
-
-    LaunchedEffect(enc.id) {
-        WaveformStomp.frames(enc.id).collect { f ->
-            wave = f.values
-            streaming = true
-        }
-    }
-    LaunchedEffect(enc.id) {
-        while (true) {
-            vitals = runCatching { Backend.api.latestVitals(enc.id) }.getOrDefault(vitals)
-            news2 = runCatching { Backend.api.news2(enc.id) }.getOrNull() ?: news2
-            alerts = runCatching { Backend.api.alerts(enc.id) }.getOrDefault(alerts)
-                .filter { it.status != "RESOLVED" }
-            delay(5000)
-        }
-    }
-
+internal fun MonitorContent(enc: Encounter, state: MonitorUiState, onBack: () -> Unit) {
     val name = listOfNotNull(enc.patient?.firstName, enc.patient?.lastName).joinToString(" ").ifBlank { "Patient" }
     val bed = listOfNotNull(enc.wardLabel, enc.bedLabel).joinToString("-")
     Scaffold(
@@ -111,8 +95,8 @@ fun MonitorScreen(enc: Encounter, onBack: () -> Unit) {
         },
         containerColor = Bg,
     ) { pad ->
-        val map = vitals.associateBy { it.type }
-        val bd = news2?.breakdown ?: emptyMap()
+        val map = state.vitals.associateBy { it.type }
+        val bd = state.news2?.breakdown ?: emptyMap()
         LazyColumn(
             modifier = Modifier.padding(pad).fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
@@ -124,11 +108,11 @@ fun MonitorScreen(enc: Encounter, onBack: () -> Unit) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text("ECG II · 250 Hz", color = OnMuted, fontSize = 11.sp)
                             Text(
-                                if (streaming) "● Streaming" else "○ Waiting",
-                                color = if (streaming) Primary else OnMuted, fontSize = 11.sp,
+                                if (state.streaming) "● Streaming" else "○ Waiting",
+                                color = if (state.streaming) Primary else OnMuted, fontSize = 11.sp,
                             )
                         }
-                        WaveformView(wave, HrGreen, Modifier.fillMaxWidth().weight(1f))
+                        WaveformView(state.wave, HrGreen, Modifier.fillMaxWidth().weight(1f))
                     }
                 }
             }
@@ -147,14 +131,14 @@ fun MonitorScreen(enc: Encounter, onBack: () -> Unit) {
             item {
                 BpTile(map["BLOOD_PRESSURE_SYSTOLIC"]?.value, map["BLOOD_PRESSURE_DIASTOLIC"]?.value, bd["systolicBp"])
             }
-            item { News2Panel(news2) }
+            item { News2Panel(state.news2) }
             item {
                 Text("Active Alarms", color = BpWhite, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             }
-            if (alerts.isEmpty()) {
+            if (state.alerts.isEmpty()) {
                 item { Text("No active alarms", color = OnMuted, fontSize = 13.sp) }
             } else {
-                items(alerts, key = { it.id }) { AlarmRow(it) }
+                items(state.alerts, key = { it.id }) { AlarmRow(it) }
             }
         }
     }

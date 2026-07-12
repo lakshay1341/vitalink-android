@@ -33,7 +33,7 @@ optional per step; full end-to-end retest at the end.
   fan-out off the composable into the VM. Screen collects with
   `collectAsStateWithLifecycle()`. Compile.
 
-- [ ] **B2 — Monitor.** `MonitorViewModel` owning the waveform stream collection, the 5s vitals/
+- [x] **B2 — Monitor.** `MonitorViewModel` owning the waveform stream collection, the 5s vitals/
   news2/alerts poll, and `StateFlow<MonitorUiState>`. Screen becomes render-only. Compile.
 
 - [ ] **B3 — Login.** `LoginViewModel` with form state + `authenticate` call + error state.
@@ -73,3 +73,4 @@ optional per step; full end-to-end retest at the end.
 - A1 done — Hilt DI: hilt+ksp plugins, @HiltAndroidApp VitaLinkApp, @AndroidEntryPoint MainActivity, SessionManager (single source for baseUrl/token), NetworkModule (Moshi/OkHttp/Retrofit/VitaLinkApi, dynamic base-url via interceptor). Backend kept as delegating shim. kspDebugKotlin + compile pass.
 - A2 done — VitaLinkRepository interface (domain) + VitaLinkRepositoryImpl (@Inject, Result<T> via runCatching, waveform Flow) + RepositoryModule (@Binds). Compiles.
 - B1 done — DashboardViewModel (@HiltViewModel) with StateFlow<DashboardUiState> (Loading/Content(rows)/Error); fan-out moved to VM (repo.encounters + concurrent news2/vitals). Screen render-only DashboardContent, collectAsStateWithLifecycle, hiltViewModel(). Compiles.
+- B2 done — MonitorViewModel (@HiltViewModel) owns waveform stream + 5s poll, exposes StateFlow<MonitorUiState> (data-class snapshot). Screen render-only MonitorContent(enc,state,onBack); start() idempotent; VM scope cancels stream on leave. Compiles.
