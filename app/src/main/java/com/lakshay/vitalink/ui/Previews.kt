@@ -64,7 +64,7 @@ private fun Frame(content: @Composable () -> Unit) {
 @Preview(name = "Login", showBackground = true, backgroundColor = BG, widthDp = 360, heightDp = 760)
 @Composable
 private fun LoginPreview() {
-    VitaLinkTheme { LoginScreen(onLoggedIn = {}) }
+    VitaLinkTheme { LoginContent(LoginUiState(), {}, {}, {}, {}, {}) }
 }
 
 @Preview(name = "Ward — empty", showBackground = true, backgroundColor = BG, widthDp = 360, heightDp = 520)

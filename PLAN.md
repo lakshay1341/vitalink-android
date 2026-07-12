@@ -36,8 +36,8 @@ optional per step; full end-to-end retest at the end.
 - [x] **B2 — Monitor.** `MonitorViewModel` owning the waveform stream collection, the 5s vitals/
   news2/alerts poll, and `StateFlow<MonitorUiState>`. Screen becomes render-only. Compile.
 
-- [ ] **B3 — Login.** `LoginViewModel` with form state + `authenticate` call + error state.
-  Screen render-only. Compile.
+- [x] **B3 — Login.** `LoginViewModel` with form state + `authenticate` call + error state.
+   Screen render-only. Compile.
 
 ## Phase C — New features (against existing backend APIs)
 
@@ -74,3 +74,4 @@ optional per step; full end-to-end retest at the end.
 - A2 done — VitaLinkRepository interface (domain) + VitaLinkRepositoryImpl (@Inject, Result<T> via runCatching, waveform Flow) + RepositoryModule (@Binds). Compiles.
 - B1 done — DashboardViewModel (@HiltViewModel) with StateFlow<DashboardUiState> (Loading/Content(rows)/Error); fan-out moved to VM (repo.encounters + concurrent news2/vitals). Screen render-only DashboardContent, collectAsStateWithLifecycle, hiltViewModel(). Compiles.
 - B2 done — MonitorViewModel (@HiltViewModel) owns waveform stream + 5s poll, exposes StateFlow<MonitorUiState> (data-class snapshot). Screen render-only MonitorContent(enc,state,onBack); start() idempotent; VM scope cancels stream on leave. Compiles.
+- B3 done — LoginViewModel (@HiltViewModel) owns form state + submit via repo.login, StateFlow<LoginUiState> (success flag drives nav). Screen render-only LoginContent; LoginPreview switched to LoginContent. Backend no longer referenced by any screen (only WaveformStomp keeps the shim). MVVM phase complete. Compiles.
