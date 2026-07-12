@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.lakshay.vitalink.data.Encounter
 import com.lakshay.vitalink.ui.DashboardScreen
 import com.lakshay.vitalink.ui.AlarmThresholdsScreen
+import com.lakshay.vitalink.ui.AlarmHistoryScreen
 import com.lakshay.vitalink.ui.LoginScreen
 import com.lakshay.vitalink.ui.MonitorScreen
 import com.lakshay.vitalink.ui.theme.VitaLinkTheme
@@ -41,12 +42,18 @@ class MainActivity : ComponentActivity() {
                                 enc,
                                 onBack = { nav.popBackStack() },
                                 onEditThresholds = { nav.navigate("thresholds") },
+                                onHistory = { nav.navigate("history") },
                             )
                         }
                     }
                     composable("thresholds") {
                         selected.value?.let { enc ->
                             AlarmThresholdsScreen(enc, onBack = { nav.popBackStack() })
+                        }
+                    }
+                    composable("history") {
+                        selected.value?.let { enc ->
+                            AlarmHistoryScreen(enc, onBack = { nav.popBackStack() })
                         }
                     }
                 }

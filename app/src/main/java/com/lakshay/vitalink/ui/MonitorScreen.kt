@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -66,16 +67,17 @@ fun MonitorScreen(
     enc: Encounter,
     onBack: () -> Unit,
     onEditThresholds: () -> Unit,
+    onHistory: () -> Unit,
     viewModel: MonitorViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(enc.id) { viewModel.start(enc.id) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    MonitorContent(enc = enc, state = state, onBack = onBack, onEditThresholds = onEditThresholds)
+    MonitorContent(enc = enc, state = state, onBack = onBack, onEditThresholds = onEditThresholds, onHistory = onHistory)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MonitorContent(enc: Encounter, state: MonitorUiState, onBack: () -> Unit, onEditThresholds: () -> Unit) {
+internal fun MonitorContent(enc: Encounter, state: MonitorUiState, onBack: () -> Unit, onEditThresholds: () -> Unit, onHistory: () -> Unit) {
     val name = listOfNotNull(enc.patient?.firstName, enc.patient?.lastName).joinToString(" ").ifBlank { "Patient" }
     val bed = listOfNotNull(enc.wardLabel, enc.bedLabel).joinToString("-")
     Scaffold(
@@ -93,6 +95,9 @@ internal fun MonitorContent(enc: Encounter, state: MonitorUiState, onBack: () ->
                     }
                 },
                 actions = {
+                    IconButton(onClick = onHistory) {
+                        Icon(Icons.Filled.History, contentDescription = "Alarm history", tint = BpWhite)
+                    }
                     IconButton(onClick = onEditThresholds) {
                         Icon(Icons.Filled.Tune, contentDescription = "Alarm thresholds", tint = BpWhite)
                     }

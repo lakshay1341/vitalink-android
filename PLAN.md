@@ -45,7 +45,7 @@ optional per step; full end-to-end retest at the end.
   min/max/severity/enabled via the existing `/api/alert-rules` CRUD. Add API methods + repo +
   ViewModel + screen + nav entry from the monitor. Compile.
 
-- [ ] **C2 — Alarm history.** Screen showing resolved+active alerts for an encounter
+- [x] **C2 — Alarm history.** Screen showing resolved+active alerts for an encounter
   (`/api/alerts?encounterId.equals=`, include RESOLVED). ViewModel + screen + nav. Compile.
 
 - [ ] **C3 — Technical vs physiological alarms.** Split alarm display into technical
@@ -76,3 +76,4 @@ optional per step; full end-to-end retest at the end.
 - B2 done — MonitorViewModel (@HiltViewModel) owns waveform stream + 5s poll, exposes StateFlow<MonitorUiState> (data-class snapshot). Screen render-only MonitorContent(enc,state,onBack); start() idempotent; VM scope cancels stream on leave. Compiles.
 - B3 done — LoginViewModel (@HiltViewModel) owns form state + submit via repo.login, StateFlow<LoginUiState> (success flag drives nav). Screen render-only LoginContent; LoginPreview switched to LoginContent. Backend no longer referenced by any screen (only WaveformStomp keeps the shim). MVVM phase complete. Compiles.
 - C1 done — edit-alarm-thresholds feature: AlertRule model, VitaLinkApi alertRules()/updateAlertRule(), repo methods (rules filtered client-side — backend has no criteria filter), AlarmThresholdsViewModel (Loading/Content/Error), AlarmThresholdsScreen (per-rule card: min/max fields, severity dropdown, enabled switch, Save via PUT), Tune action in Monitor top bar + "thresholds" nav route. Compiles.
+- C2 done — alarm-history feature: AlarmHistoryViewModel (Loading/Content/Error) via repo.alerts(size=100, includes RESOLVED), AlarmHistoryScreen (rows show message + severity·status·time, resolved rows muted), History icon in Monitor top bar + "history" nav route. Compiles.
