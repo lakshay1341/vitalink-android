@@ -145,12 +145,20 @@ internal fun MonitorContent(enc: Encounter, state: MonitorUiState, onBack: () ->
             }
             item { News2Panel(state.news2) }
             item {
-                Text("Active Alarms", color = BpWhite, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Text("Physiological Alarms", color = BpWhite, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             }
             if (state.alerts.isEmpty()) {
-                item { Text("No active alarms", color = OnMuted, fontSize = 13.sp) }
+                item { Text("No physiological alarms", color = OnMuted, fontSize = 13.sp) }
             } else {
                 items(state.alerts, key = { it.id }) { AlarmRow(it) }
+            }
+            item {
+                Text("Technical Alarms", color = BpWhite, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            }
+            if (state.technical.isEmpty()) {
+                item { Text("No technical alarms", color = OnMuted, fontSize = 13.sp) }
+            } else {
+                items(state.technical, key = { it.label }) { TechnicalAlarmRow(it) }
             }
         }
     }
@@ -274,6 +282,19 @@ internal fun AlarmRow(a: Alert) {
             Column(Modifier.padding(14.dp)) {
                 Text(a.message ?: (a.severity ?: "Alarm"), color = BpWhite, fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 Text("${a.severity ?: ""} · ${shortTime(a.triggeredAt)}", color = OnMuted, fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TechnicalAlarmRow(t: TechnicalAlarm) {
+    Surface(color = SurfaceColor, shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.height(IntrinsicSize.Min)) {
+            Box(Modifier.width(4.dp).fillMaxHeight().background(Color(0xFF60A5FA)))
+            Column(Modifier.padding(14.dp)) {
+                Text(t.label, color = BpWhite, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(t.detail, color = OnMuted, fontSize = 12.sp)
             }
         }
     }

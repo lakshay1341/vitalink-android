@@ -48,7 +48,7 @@ optional per step; full end-to-end retest at the end.
 - [x] **C2 — Alarm history.** Screen showing resolved+active alerts for an encounter
   (`/api/alerts?encounterId.equals=`, include RESOLVED). ViewModel + screen + nav. Compile.
 
-- [ ] **C3 — Technical vs physiological alarms.** Split alarm display into technical
+- [x] **C3 — Technical vs physiological alarms.** Split alarm display into technical
   (sensor/device: from AdtEvent or a device-status signal) vs physiological (vital breach), per
   IEC 60601-1-8. Group/tag in the monitor alarms section. Compile. (If backend lacks a technical
   signal, tag by rule vitalType == device-status heuristic and note the ceiling with a ponytail
@@ -77,3 +77,4 @@ optional per step; full end-to-end retest at the end.
 - B3 done — LoginViewModel (@HiltViewModel) owns form state + submit via repo.login, StateFlow<LoginUiState> (success flag drives nav). Screen render-only LoginContent; LoginPreview switched to LoginContent. Backend no longer referenced by any screen (only WaveformStomp keeps the shim). MVVM phase complete. Compiles.
 - C1 done — edit-alarm-thresholds feature: AlertRule model, VitaLinkApi alertRules()/updateAlertRule(), repo methods (rules filtered client-side — backend has no criteria filter), AlarmThresholdsViewModel (Loading/Content/Error), AlarmThresholdsScreen (per-rule card: min/max fields, severity dropdown, enabled switch, Save via PUT), Tune action in Monitor top bar + "thresholds" nav route. Compiles.
 - C2 done — alarm-history feature: AlarmHistoryViewModel (Loading/Content/Error) via repo.alerts(size=100, includes RESOLVED), AlarmHistoryScreen (rows show message + severity·status·time, resolved rows muted), History icon in Monitor top bar + "history" nav route. Compiles.
+- C3 done — technical vs physiological alarm split (IEC 60601-1-8): backend alerts shown as Physiological; Technical alarms synthesized in MonitorViewModel from observed stream (no waveform for 8s = "ECG signal loss"). Monitor now has two alarm sections; TechnicalAlarmRow with blue device bar. Compiles.
