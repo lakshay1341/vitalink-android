@@ -28,7 +28,7 @@ optional per step; full end-to-end retest at the end.
 
 ## Phase B — MVVM refactor (ViewModel + StateFlow + sealed UiState)
 
-- [ ] **B1 — Dashboard.** `DashboardViewModel` (@HiltViewModel) exposing
+- [x] **B1 — Dashboard.** `DashboardViewModel` (@HiltViewModel) exposing
   `StateFlow<DashboardUiState>` (Loading / Content(list) / Error). Move the encounters+news2+vitals
   fan-out off the composable into the VM. Screen collects with
   `collectAsStateWithLifecycle()`. Compile.
@@ -72,3 +72,4 @@ optional per step; full end-to-end retest at the end.
 (append one line per completed step)
 - A1 done — Hilt DI: hilt+ksp plugins, @HiltAndroidApp VitaLinkApp, @AndroidEntryPoint MainActivity, SessionManager (single source for baseUrl/token), NetworkModule (Moshi/OkHttp/Retrofit/VitaLinkApi, dynamic base-url via interceptor). Backend kept as delegating shim. kspDebugKotlin + compile pass.
 - A2 done — VitaLinkRepository interface (domain) + VitaLinkRepositoryImpl (@Inject, Result<T> via runCatching, waveform Flow) + RepositoryModule (@Binds). Compiles.
+- B1 done — DashboardViewModel (@HiltViewModel) with StateFlow<DashboardUiState> (Loading/Content(rows)/Error); fan-out moved to VM (repo.encounters + concurrent news2/vitals). Screen render-only DashboardContent, collectAsStateWithLifecycle, hiltViewModel(). Compiles.

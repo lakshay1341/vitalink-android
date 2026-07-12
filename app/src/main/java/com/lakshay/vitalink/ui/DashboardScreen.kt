@@ -5,10 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,12 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +42,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lakshay.vitalink.data.Backend
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lakshay.vitalink.data.Encounter
 import com.lakshay.vitalink.data.LatestVital
 import com.lakshay.vitalink.data.News2Result
@@ -62,46 +58,24 @@ import com.lakshay.vitalink.ui.theme.RiskLow
 import com.lakshay.vitalink.ui.theme.RiskMedium
 import com.lakshay.vitalink.ui.theme.Spo2Cyan
 import com.lakshay.vitalink.ui.theme.Surface as SurfaceColor
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 
-private val ACTIVE = setOf("PRE_ADMIT", "ADMITTED", "DISCHARGE_PENDING")
+@Composable
+fun DashboardScreen(
+    onOpen: (Encounter) -> Unit,
+    viewModel: DashboardViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    DashboardContent(state = state, onRefresh = viewModel::load, onOpen = onOpen)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(onOpen: (Encounter) -> Unit) {
-    var encounters by remember { mutableStateOf<List<Encounter>>(emptyList()) }
-    var scores by remember { mutableStateOf<Map<Long, News2Result>>(emptyMap()) }
-    var vitals by remember { mutableStateOf<Map<Long, List<LatestVital>>>(emptyMap()) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var loading by remember { mutableStateOf(true) }
-    var reload by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(reload) {
-        loading = true
-        error = null
-        try {
-            val list = Backend.api.encounters().filter { it.status in ACTIVE }
-            encounters = list
-            val s = mutableMapOf<Long, News2Result>()
-            val v = mutableMapOf<Long, List<LatestVital>>()
-            coroutineScope {
-                list.forEach { enc ->
-                    val ns = async { runCatching { Backend.api.news2(enc.id) }.getOrNull() }
-                    val vt = async { runCatching { Backend.api.latestVitals(enc.id) }.getOrNull() }
-                    ns.await()?.let { s[enc.id] = it }
-                    vt.await()?.let { v[enc.id] = it }
-                }
-            }
-            scores = s
-            vitals = v
-        } catch (e: Exception) {
-            error = e.message
-        } finally {
-            loading = false
-        }
-    }
-
+internal fun DashboardContent(
+    state: DashboardUiState,
+    onRefresh: () -> Unit,
+    onOpen: (Encounter) -> Unit,
+) {
+    val rows = (state as? DashboardUiState.Content)?.rows.orEmpty()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -110,7 +84,7 @@ fun DashboardScreen(onOpen: (Encounter) -> Unit) {
                     Box(Modifier.size(8.dp).clip(CircleShape).background(Primary))
                     Spacer(Modifier.width(6.dp))
                     Text("Connected", color = OnMuted, fontSize = 12.sp)
-                    IconButton(onClick = { reload++ }) {
+                    IconButton(onClick = onRefresh) {
                         Icon(Icons.Filled.FilterList, contentDescription = "Refresh", tint = OnMuted)
                     }
                 },
@@ -121,23 +95,26 @@ fun DashboardScreen(onOpen: (Encounter) -> Unit) {
     ) { pad ->
         Column(Modifier.padding(pad).fillMaxSize()) {
             Text(
-                "Ward · ${encounters.size} monitored",
+                "Ward · ${rows.size} monitored",
                 color = OnMuted, fontSize = 13.sp,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
-            if (loading) LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Primary)
-            error?.let { Text("Error: $it", color = RiskHigh, modifier = Modifier.padding(16.dp)) }
-            if (!loading && error == null && encounters.isEmpty()) {
-                EmptyWard(onRefresh = { reload++ })
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(encounters, key = { it.id }) { enc ->
-                        PatientCard(enc, scores[enc.id], vitals[enc.id]) { onOpen(enc) }
+            when (state) {
+                is DashboardUiState.Loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Primary)
+                is DashboardUiState.Error -> Text("Error: ${state.message}", color = RiskHigh, modifier = Modifier.padding(16.dp))
+                is DashboardUiState.Content ->
+                    if (rows.isEmpty()) {
+                        EmptyWard(onRefresh = onRefresh)
+                    } else {
+                        LazyColumn(
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(rows, key = { it.encounter.id }) { row ->
+                                PatientCard(row.encounter, row.news2, row.vitals) { onOpen(row.encounter) }
+                            }
+                        }
                     }
-                }
             }
         }
     }
