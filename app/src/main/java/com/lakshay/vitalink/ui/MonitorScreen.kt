@@ -1,6 +1,8 @@
 package com.lakshay.vitalink.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,9 +15,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -56,8 +61,8 @@ import com.lakshay.vitalink.ui.theme.RiskHigh
 import com.lakshay.vitalink.ui.theme.RiskLow
 import com.lakshay.vitalink.ui.theme.RiskMedium
 import com.lakshay.vitalink.ui.theme.Spo2Cyan
-import com.lakshay.vitalink.ui.theme.Surface as SurfaceColor
 import com.lakshay.vitalink.ui.theme.TempOrange
+import com.lakshay.vitalink.ui.theme.Surface as SurfaceColor
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -107,6 +112,7 @@ fun MonitorScreen(enc: Encounter, onBack: () -> Unit) {
         containerColor = Bg,
     ) { pad ->
         val map = vitals.associateBy { it.type }
+        val bd = news2?.breakdown ?: emptyMap()
         LazyColumn(
             modifier = Modifier.padding(pad).fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
@@ -128,18 +134,18 @@ fun MonitorScreen(enc: Encounter, onBack: () -> Unit) {
             }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                    VitalTile("HR", map["HEART_RATE"]?.value, "bpm", HrGreen, Modifier.weight(1f))
-                    VitalTile("SpO2", map["SPO2"]?.value, "%", Spo2Cyan, Modifier.weight(1f))
+                    VitalTile("HR", map["HEART_RATE"]?.value, "bpm", HrGreen, bd["heartRate"], Modifier.weight(1f))
+                    VitalTile("SpO₂", map["SPO2"]?.value, "%", Spo2Cyan, bd["spo2"], Modifier.weight(1f))
                 }
             }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                    VitalTile("RESP", map["RESPIRATORY_RATE"]?.value, "/min", RespYellow, Modifier.weight(1f))
-                    VitalTile("TEMP", map["BODY_TEMPERATURE"]?.value, "°C", TempOrange, Modifier.weight(1f))
+                    VitalTile("RESP", map["RESPIRATORY_RATE"]?.value, "/min", RespYellow, bd["respiratoryRate"], Modifier.weight(1f))
+                    VitalTile("TEMP", map["BODY_TEMPERATURE"]?.value, "°C", TempOrange, bd["temperature"], Modifier.weight(1f))
                 }
             }
             item {
-                BpTile(map["BLOOD_PRESSURE_SYSTOLIC"]?.value, map["BLOOD_PRESSURE_DIASTOLIC"]?.value)
+                BpTile(map["BLOOD_PRESSURE_SYSTOLIC"]?.value, map["BLOOD_PRESSURE_DIASTOLIC"]?.value, bd["systolicBp"])
             }
             item { News2Panel(news2) }
             item {
@@ -155,10 +161,22 @@ fun MonitorScreen(enc: Encounter, onBack: () -> Unit) {
 }
 
 @Composable
-private fun VitalTile(label: String, value: Double?, unit: String, color: Color, modifier: Modifier = Modifier) {
-    Surface(color = SurfaceColor, shape = RoundedCornerShape(8.dp), modifier = modifier) {
+private fun VitalTile(label: String, value: Double?, unit: String, color: Color, score: Int?, modifier: Modifier = Modifier) {
+    val flag = when {
+        score == null -> null
+        score >= 3 -> RiskHigh
+        score >= 1 -> RiskMedium
+        else -> null
+    }
+    Surface(
+        color = SurfaceColor, shape = RoundedCornerShape(8.dp),
+        modifier = modifier.then(if (flag != null) Modifier.border(1.5.dp, flag, RoundedCornerShape(8.dp)) else Modifier),
+    ) {
         Column(Modifier.padding(14.dp)) {
-            Text(label.uppercase(), color = OnMuted, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(label.uppercase(), color = OnMuted, fontSize = 11.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                if (flag != null) Box(Modifier.size(8.dp).clip(CircleShape).background(flag))
+            }
             Spacer(Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(value?.let { fmt(it) } ?: "--", color = color, fontSize = 30.sp, fontWeight = FontWeight.Bold)
@@ -170,10 +188,22 @@ private fun VitalTile(label: String, value: Double?, unit: String, color: Color,
 }
 
 @Composable
-private fun BpTile(sys: Double?, dia: Double?) {
-    Surface(color = SurfaceColor, shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth()) {
+private fun BpTile(sys: Double?, dia: Double?, score: Int?) {
+    val flag = when {
+        score == null -> null
+        score >= 3 -> RiskHigh
+        score >= 1 -> RiskMedium
+        else -> null
+    }
+    Surface(
+        color = SurfaceColor, shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.fillMaxWidth().then(if (flag != null) Modifier.border(1.5.dp, flag, RoundedCornerShape(8.dp)) else Modifier),
+    ) {
         Column(Modifier.padding(14.dp)) {
-            Text("BLOOD PRESSURE", color = OnMuted, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("BLOOD PRESSURE", color = OnMuted, fontSize = 11.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                if (flag != null) Box(Modifier.size(8.dp).clip(CircleShape).background(flag))
+            }
             Spacer(Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
@@ -198,20 +228,38 @@ private fun News2Panel(news2: News2Result?) {
         "LOW" -> { color = RiskLow; label = "Low risk" }
         else -> { color = OnMuted; label = "—" }
     }
+    val scored = news2?.breakdown?.filterValues { it > 0 } ?: emptyMap()
     Surface(color = SurfaceColor, shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth()) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier.clip(RoundedCornerShape(8.dp)).background(color).padding(horizontal = 16.dp, vertical = 10.dp),
-            ) {
-                Text(news2?.total?.toString() ?: "–", color = Bg, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier.clip(RoundedCornerShape(8.dp)).background(color).padding(horizontal = 16.dp, vertical = 10.dp),
+                ) {
+                    Text(news2?.total?.toString() ?: "–", color = Bg, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+                }
+                Spacer(Modifier.width(16.dp))
+                Column {
+                    Text("NEWS2", color = BpWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        label + if (news2?.complete == false) " · incomplete" else "",
+                        color = OnMuted, fontSize = 13.sp,
+                    )
+                }
             }
-            Spacer(Modifier.width(16.dp))
-            Column {
-                Text("NEWS2", color = BpWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(
-                    label + if (news2?.complete == false) " · incomplete" else "",
-                    color = OnMuted, fontSize = 13.sp,
-                )
+            if (scored.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    scored.entries.forEach { (k, v) ->
+                        Text(
+                            "${shortParam(k)} $v",
+                            color = if (v >= 3) RiskHigh else RiskMedium,
+                            fontSize = 11.sp, fontWeight = FontWeight.Medium,
+                        )
+                    }
+                }
             }
         }
     }
@@ -233,6 +281,17 @@ private fun AlarmRow(a: Alert) {
             }
         }
     }
+}
+
+private fun shortParam(k: String): String = when (k) {
+    "respiratoryRate" -> "RR"
+    "spo2" -> "SpO₂"
+    "oxygen" -> "O₂"
+    "systolicBp" -> "BP"
+    "heartRate" -> "HR"
+    "consciousness" -> "ACVPU"
+    "temperature" -> "Temp"
+    else -> k
 }
 
 private fun fmt(v: Double): String = if (v == v.toLong().toDouble()) v.toLong().toString() else String.format("%.1f", v)

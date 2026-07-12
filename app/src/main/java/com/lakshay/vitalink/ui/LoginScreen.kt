@@ -1,12 +1,18 @@
 package com.lakshay.vitalink.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -26,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -36,6 +43,7 @@ import com.lakshay.vitalink.data.Backend
 import com.lakshay.vitalink.data.LoginRequest
 import com.lakshay.vitalink.ui.theme.OnMuted
 import com.lakshay.vitalink.ui.theme.Primary
+import com.lakshay.vitalink.ui.theme.RiskHigh
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,12 +56,19 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val hasError = error != null
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(8.dp).clip(CircleShape).background(if (hasError) RiskHigh else Primary))
+            Spacer(Modifier.width(6.dp))
+            Text(if (hasError) "Auth error" else "System ready", color = OnMuted, fontSize = 12.sp)
+        }
+        Spacer(Modifier.height(24.dp))
         Text("VitaLink", color = Primary, fontSize = 34.sp, fontWeight = FontWeight.Bold)
         Text("Remote Patient Monitoring", color = OnMuted, fontSize = 14.sp)
         Spacer(Modifier.height(32.dp))
@@ -72,6 +87,7 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
         OutlinedTextField(
             value = pass, onValueChange = { pass = it },
             label = { Text("Password") }, singleLine = true,
+            isError = hasError,
             visualTransformation = if (show) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             trailingIcon = {
@@ -83,7 +99,7 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
         )
         error?.let {
             Spacer(Modifier.height(8.dp))
-            Text(it, color = MaterialTheme.colorScheme.error, fontSize = 13.sp)
+            Text(it, color = MaterialTheme.colorScheme.error, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
         }
         Spacer(Modifier.height(20.dp))
         Button(

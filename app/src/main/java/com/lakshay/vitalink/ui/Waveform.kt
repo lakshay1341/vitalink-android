@@ -1,12 +1,20 @@
 package com.lakshay.vitalink.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.lakshay.vitalink.ui.theme.HrGreen
+import com.lakshay.vitalink.ui.theme.VitaLinkTheme
+import kotlin.math.sin
 
 /**
  * Draws one ECG frame as a single bright polyline on a faint grid, auto-scaled to fit.
@@ -46,5 +54,21 @@ fun WaveformView(values: DoubleArray, trace: Color, modifier: Modifier = Modifie
             if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
         }
         drawPath(path, trace, style = Stroke(width = 2.5f))
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF0B1120)
+@Composable
+private fun WaveformViewPreview() {
+    VitaLinkTheme {
+        val sampleWave = DoubleArray(100) { i -> sin(i.toDouble() / 5.0) }
+        WaveformView(
+            values = sampleWave,
+            trace = HrGreen,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+                .padding(8.dp)
+        )
     }
 }
