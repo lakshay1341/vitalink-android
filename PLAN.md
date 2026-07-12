@@ -56,7 +56,7 @@ optional per step; full end-to-end retest at the end.
 
 ## Phase D — Offline cache
 
-- [ ] **D1 — Room cache.** Room DB with `EncounterEntity` + `VitalEntity` (+ Daos). Repository
+- [x] **D1 — Room cache.** Room DB with `EncounterEntity` + `VitalEntity` (+ Daos). Repository
   writes through on fetch, reads cache first so the dashboard/monitor aren't blank offline.
   Provide DB via Hilt. Compile.
 
@@ -78,3 +78,4 @@ optional per step; full end-to-end retest at the end.
 - C1 done — edit-alarm-thresholds feature: AlertRule model, VitaLinkApi alertRules()/updateAlertRule(), repo methods (rules filtered client-side — backend has no criteria filter), AlarmThresholdsViewModel (Loading/Content/Error), AlarmThresholdsScreen (per-rule card: min/max fields, severity dropdown, enabled switch, Save via PUT), Tune action in Monitor top bar + "thresholds" nav route. Compiles.
 - C2 done — alarm-history feature: AlarmHistoryViewModel (Loading/Content/Error) via repo.alerts(size=100, includes RESOLVED), AlarmHistoryScreen (rows show message + severity·status·time, resolved rows muted), History icon in Monitor top bar + "history" nav route. Compiles.
 - C3 done — technical vs physiological alarm split (IEC 60601-1-8): backend alerts shown as Physiological; Technical alarms synthesized in MonitorViewModel from observed stream (no waveform for 8s = "ECG signal loss"). Monitor now has two alarm sections; TechnicalAlarmRow with blue device bar. Compiles.
+- D1 done — Room offline cache: EncounterEntity+VitalEntity+Daos+VitaLinkDb, DatabaseModule (Hilt provides DB+Daos), repo write-through on fetch + return cached copy on network failure (dashboard/monitor survive offline). Compiles (Room KSP codegen + Hilt DAO injection OK).
