@@ -15,14 +15,14 @@ import javax.inject.Singleton
  * for encounters and latest vitals: successful fetches write through to the DB, and on
  * network failure the cached copy is returned so the dashboard/monitor aren't blank
  * offline. runCatching keeps the ViewModels try/catch-free.
- * ponytail: waveform still delegates to the static WaveformStomp (its OkHttp stays on the
- * legacy Backend shim); inject the client into WaveformStomp when Backend is finally deleted.
+ * The live waveform is provided by an injected WaveformStomp (its own OkHttp + auth interceptor).
  */
 @Singleton
 class VitaLinkRepositoryImpl @Inject constructor(
     private val api: VitaLinkApi,
     private val encounterDao: EncounterDao,
     private val vitalDao: VitalDao,
+    private val waveformStomp: WaveformStomp,
 ) : VitaLinkRepository {
 
     override suspend fun login(serverUrl: String, username: String, password: String): Result<Unit> = runCatching {
@@ -58,5 +58,5 @@ class VitaLinkRepositoryImpl @Inject constructor(
     override suspend fun updateAlertRule(rule: AlertRule): Result<AlertRule> =
         runCatching { api.updateAlertRule(rule.id, rule) }
 
-    override fun waveform(encounterId: Long): Flow<WaveformFrame> = WaveformStomp.frames(encounterId)
+    override fun waveform(encounterId: Long): Flow<WaveformFrame> = waveformStomp.frames(encounterId)
 }

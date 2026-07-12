@@ -105,8 +105,6 @@ around 60 s in the simulator's scripted SpO₂ desaturation raises an alarm. Sto
 
 ## Deliberate shortcuts
 
-- `WaveformStomp` still uses the legacy static `Backend` shim for its OkHttp client; the REST path
-  is fully DI'd. Inject the client into `WaveformStomp` to delete `Backend` entirely.
 - Technical alarms are synthesized from one signal (no waveform for 8 s = signal loss). Wire real
   battery / sensor-off alarms when the device reports status (e.g. the MQTT last-will path).
 - Inter is declared in the design system but the app uses the platform default font; drop the font
