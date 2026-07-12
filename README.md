@@ -107,5 +107,9 @@ around 60 s in the simulator's scripted SpO₂ desaturation raises an alarm. Sto
 
 - Technical alarms are synthesized from one signal (no waveform for 8 s = signal loss). Wire real
   battery / sensor-off alarms when the device reports status (e.g. the MQTT last-will path).
-- Inter is declared in the design system but the app uses the platform default font; drop the font
-  files in `res/font` and wire a `Typography` to match pixel-for-pixel.
+
+## Fonts
+
+Bundles [Inter](https://github.com/rsms/inter) (`app/src/main/res/font/inter.ttf`, one variable
+font driving all weights via `FontVariation`), licensed under the SIL Open Font License 1.1.
+
