@@ -1,10 +1,21 @@
 .gradle/
 build/
 /app/build/
-/local.properties
 .idea/
+.kotlin/
 *.iml
 .DS_Store
 captures/
 .externalNativeBuild/
 .cxx/
+
+# local machine config (SDK path) — never commit
+local.properties
+
+# Stray nested gradle project accidentally created under app/ — the real project
+# lives at the repo root (settings.gradle.kts includes :app). Keep these out of git.
+/app/gradlew
+/app/gradlew.bat
+/app/gradle/
+/app/settings.gradle.kts
+/app/gradle.properties
