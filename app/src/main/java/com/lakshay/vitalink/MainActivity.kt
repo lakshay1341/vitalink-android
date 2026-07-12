@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lakshay.vitalink.data.Encounter
 import com.lakshay.vitalink.ui.DashboardScreen
+import com.lakshay.vitalink.ui.AlarmThresholdsScreen
 import com.lakshay.vitalink.ui.LoginScreen
 import com.lakshay.vitalink.ui.MonitorScreen
 import com.lakshay.vitalink.ui.theme.VitaLinkTheme
@@ -36,7 +37,16 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("monitor") {
                         selected.value?.let { enc ->
-                            MonitorScreen(enc, onBack = { nav.popBackStack() })
+                            MonitorScreen(
+                                enc,
+                                onBack = { nav.popBackStack() },
+                                onEditThresholds = { nav.navigate("thresholds") },
+                            )
+                        }
+                    }
+                    composable("thresholds") {
+                        selected.value?.let { enc ->
+                            AlarmThresholdsScreen(enc, onBack = { nav.popBackStack() })
                         }
                     }
                 }

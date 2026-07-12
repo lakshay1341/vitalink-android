@@ -33,5 +33,11 @@ class VitaLinkRepositoryImpl @Inject constructor(
     override suspend fun alerts(encounterId: Long, size: Int): Result<List<Alert>> =
         runCatching { api.alerts(encounterId, size = size) }
 
+    override suspend fun alertRules(encounterId: Long): Result<List<AlertRule>> =
+        runCatching { api.alertRules().filter { it.encounter?.id == encounterId } }
+
+    override suspend fun updateAlertRule(rule: AlertRule): Result<AlertRule> =
+        runCatching { api.updateAlertRule(rule.id, rule) }
+
     override fun waveform(encounterId: Long): Flow<WaveformFrame> = WaveformStomp.frames(encounterId)
 }

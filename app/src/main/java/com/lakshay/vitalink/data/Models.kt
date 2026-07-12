@@ -37,6 +37,19 @@ data class Alert(
     val triggeredAt: String?,
 )
 
+data class AlertRule(
+    val id: Long,
+    val vitalType: String,
+    val minValue: Double?,
+    val maxValue: Double?,
+    val severity: String,
+    val scope: String,
+    val debounceCount: Int?,
+    val latching: Boolean?,
+    val enabled: Boolean,
+    val encounter: Encounter?,
+)
+
 data class WaveformFrame(
     val encounterId: Long?,
     val channel: String?,

@@ -1,6 +1,7 @@
 package com.lakshay.vitalink.domain
 
 import com.lakshay.vitalink.data.Alert
+import com.lakshay.vitalink.data.AlertRule
 import com.lakshay.vitalink.data.Encounter
 import com.lakshay.vitalink.data.LatestVital
 import com.lakshay.vitalink.data.News2Result
@@ -23,6 +24,11 @@ interface VitaLinkRepository {
     suspend fun latestVitals(encounterId: Long): Result<List<LatestVital>>
 
     suspend fun alerts(encounterId: Long, size: Int = 20): Result<List<Alert>>
+
+    /** Alarm rules scoped to this encounter (filtered client-side; backend has no criteria filter). */
+    suspend fun alertRules(encounterId: Long): Result<List<AlertRule>>
+
+    suspend fun updateAlertRule(rule: AlertRule): Result<AlertRule>
 
     fun waveform(encounterId: Long): Flow<WaveformFrame>
 }

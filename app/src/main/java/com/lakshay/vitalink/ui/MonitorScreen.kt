@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,16 +65,17 @@ import com.lakshay.vitalink.ui.theme.Surface as SurfaceColor
 fun MonitorScreen(
     enc: Encounter,
     onBack: () -> Unit,
+    onEditThresholds: () -> Unit,
     viewModel: MonitorViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(enc.id) { viewModel.start(enc.id) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    MonitorContent(enc = enc, state = state, onBack = onBack)
+    MonitorContent(enc = enc, state = state, onBack = onBack, onEditThresholds = onEditThresholds)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MonitorContent(enc: Encounter, state: MonitorUiState, onBack: () -> Unit) {
+internal fun MonitorContent(enc: Encounter, state: MonitorUiState, onBack: () -> Unit, onEditThresholds: () -> Unit) {
     val name = listOfNotNull(enc.patient?.firstName, enc.patient?.lastName).joinToString(" ").ifBlank { "Patient" }
     val bed = listOfNotNull(enc.wardLabel, enc.bedLabel).joinToString("-")
     Scaffold(
@@ -88,6 +90,11 @@ internal fun MonitorContent(enc: Encounter, state: MonitorUiState, onBack: () ->
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = BpWhite)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onEditThresholds) {
+                        Icon(Icons.Filled.Tune, contentDescription = "Alarm thresholds", tint = BpWhite)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Bg, titleContentColor = BpWhite),

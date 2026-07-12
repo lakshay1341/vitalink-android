@@ -9,6 +9,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -31,6 +32,12 @@ interface VitaLinkApi {
         @Query("sort") sort: String = "triggeredAt,desc",
         @Query("size") size: Int = 20,
     ): List<Alert>
+
+    @GET("api/alert-rules")
+    suspend fun alertRules(): List<AlertRule>
+
+    @PUT("api/alert-rules/{id}")
+    suspend fun updateAlertRule(@Path("id") id: Long, @Body rule: AlertRule): AlertRule
 }
 
 /**
