@@ -53,7 +53,7 @@ class VitaLinkRepositoryImpl @Inject constructor(
         runCatching { api.alerts(encounterId, size = size) }
 
     override suspend fun alertRules(encounterId: Long): Result<List<AlertRule>> =
-        runCatching { api.alertRules().filter { it.encounter?.id == encounterId } }
+        runCatching { api.alertRules(encounterId) }
 
     override suspend fun updateAlertRule(rule: AlertRule): Result<AlertRule> =
         runCatching { api.updateAlertRule(rule.id, rule) }

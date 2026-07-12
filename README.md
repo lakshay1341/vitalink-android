@@ -107,9 +107,6 @@ around 60 s in the simulator's scripted SpO₂ desaturation raises an alarm. Sto
 
 - `WaveformStomp` still uses the legacy static `Backend` shim for its OkHttp client; the REST path
   is fully DI'd. Inject the client into `WaveformStomp` to delete `Backend` entirely.
-- Alarm rules are filtered to the encounter **client-side** — the backend `getAllAlertRules` has no
-  criteria filter. Add JHipster filtering (or an `/encounters/{id}/alert-rules` endpoint) for
-  server-side scoping.
 - Technical alarms are synthesized from one signal (no waveform for 8 s = signal loss). Wire real
   battery / sensor-off alarms when the device reports status (e.g. the MQTT last-will path).
 - Inter is declared in the design system but the app uses the platform default font; drop the font

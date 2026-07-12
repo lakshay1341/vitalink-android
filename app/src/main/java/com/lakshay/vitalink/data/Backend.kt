@@ -34,7 +34,7 @@ interface VitaLinkApi {
     ): List<Alert>
 
     @GET("api/alert-rules")
-    suspend fun alertRules(): List<AlertRule>
+    suspend fun alertRules(@Query("encounterId") encounterId: Long? = null): List<AlertRule>
 
     @PUT("api/alert-rules/{id}")
     suspend fun updateAlertRule(@Path("id") id: Long, @Body rule: AlertRule): AlertRule
