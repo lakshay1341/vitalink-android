@@ -161,7 +161,7 @@ fun MonitorScreen(enc: Encounter, onBack: () -> Unit) {
 }
 
 @Composable
-private fun VitalTile(label: String, value: Double?, unit: String, color: Color, score: Int?, modifier: Modifier = Modifier) {
+internal fun VitalTile(label: String, value: Double?, unit: String, color: Color, score: Int?, modifier: Modifier = Modifier) {
     val flag = when {
         score == null -> null
         score >= 3 -> RiskHigh
@@ -188,7 +188,7 @@ private fun VitalTile(label: String, value: Double?, unit: String, color: Color,
 }
 
 @Composable
-private fun BpTile(sys: Double?, dia: Double?, score: Int?) {
+internal fun BpTile(sys: Double?, dia: Double?, score: Int?) {
     val flag = when {
         score == null -> null
         score >= 3 -> RiskHigh
@@ -218,7 +218,7 @@ private fun BpTile(sys: Double?, dia: Double?, score: Int?) {
 }
 
 @Composable
-private fun News2Panel(news2: News2Result?) {
+internal fun News2Panel(news2: News2Result?) {
     val color: Color
     val label: String
     when (news2?.risk) {
@@ -266,7 +266,7 @@ private fun News2Panel(news2: News2Result?) {
 }
 
 @Composable
-private fun AlarmRow(a: Alert) {
+internal fun AlarmRow(a: Alert) {
     val color = when (a.severity) {
         "CRITICAL", "HIGH" -> RiskHigh
         "MEDIUM" -> RiskMedium

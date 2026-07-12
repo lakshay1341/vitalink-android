@@ -144,7 +144,7 @@ fun DashboardScreen(onOpen: (Encounter) -> Unit) {
 }
 
 @Composable
-private fun EmptyWard(onRefresh: () -> Unit) {
+internal fun EmptyWard(onRefresh: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp),
         verticalArrangement = Arrangement.Center,
@@ -164,7 +164,7 @@ private fun EmptyWard(onRefresh: () -> Unit) {
 }
 
 @Composable
-private fun PatientCard(enc: Encounter, news2: News2Result?, vitals: List<LatestVital>?, onClick: () -> Unit) {
+internal fun PatientCard(enc: Encounter, news2: News2Result?, vitals: List<LatestVital>?, onClick: () -> Unit) {
     val name = listOfNotNull(enc.patient?.firstName, enc.patient?.lastName).joinToString(" ").ifBlank { "Unknown" }
     val bed = listOfNotNull(enc.wardLabel, enc.bedLabel).joinToString("-").ifBlank { "—" }
     val critical = news2?.risk == "HIGH"
