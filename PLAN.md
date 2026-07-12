@@ -15,7 +15,7 @@ optional per step; full end-to-end retest at the end.
 
 ## Phase A — Foundation
 
-- [ ] **A1 — Hilt DI.** Add hilt-android plugin + deps. `@HiltAndroidApp` Application class
+- [x] **A1 — Hilt DI.** Add hilt-android plugin + deps. `@HiltAndroidApp` Application class
   (register in manifest). `@AndroidEntryPoint` on MainActivity. `NetworkModule` @Provides for
   Moshi, OkHttp (with the auth interceptor), Retrofit, `VitaLinkApi`. Delete the hand-rolled
   `Backend` object's singletons once provided (keep `token`/`baseUrl` holder or move to a
@@ -69,4 +69,5 @@ optional per step; full end-to-end retest at the end.
 ---
 
 ## Progress log
-(append one line per completed step: `A1 done <commit> — note`)
+(append one line per completed step)
+- A1 done — Hilt DI: hilt+ksp plugins, @HiltAndroidApp VitaLinkApp, @AndroidEntryPoint MainActivity, SessionManager (single source for baseUrl/token), NetworkModule (Moshi/OkHttp/Retrofit/VitaLinkApi, dynamic base-url via interceptor). Backend kept as delegating shim. kspDebugKotlin + compile pass.

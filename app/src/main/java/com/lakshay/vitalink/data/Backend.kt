@@ -34,21 +34,30 @@ interface VitaLinkApi {
 }
 
 /**
- * App-wide backend holder. Base URL and JWT are set at login; no DI framework — a
- * three-screen demo doesn't need one.
- * ponytail: the Retrofit instance is built lazily and captures baseUrl at first use,
- * so changing the server after the first request has no effect until app restart.
+ * Legacy static network holder, kept only until the screens finish migrating to the
+ * Hilt-injected repository. baseUrl/token now delegate to SessionManager so there is a
+ * single source of truth shared with the DI network stack.
+ * ponytail: transitional — deleted once no screen references Backend directly.
  */
 object Backend {
-    @Volatile var baseUrl: String = "http://10.0.2.2:8080/"
-    @Volatile var token: String? = null
+    var baseUrl: String
+        get() = SessionManager.baseUrl
+        set(v) {
+            SessionManager.baseUrl = v
+        }
+
+    var token: String?
+        get() = SessionManager.token
+        set(v) {
+            SessionManager.token = v
+        }
 
     val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
     val http: OkHttpClient = OkHttpClient.Builder()
         .addInterceptor { chain ->
             val b = chain.request().newBuilder()
-            token?.let { b.header("Authorization", "Bearer $it") }
+            SessionManager.token?.let { b.header("Authorization", "Bearer $it") }
             chain.proceed(b.build())
         }
         .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC })
@@ -56,7 +65,7 @@ object Backend {
 
     val api: VitaLinkApi by lazy {
         Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(SessionManager.baseUrl)
             .client(http)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
@@ -64,5 +73,5 @@ object Backend {
     }
 
     /** ws://.../websocket/app derived from the REST base URL. */
-    fun wsUrl(): String = baseUrl.replaceFirst("http", "ws").trimEnd('/') + "/websocket/app"
+    fun wsUrl(): String = SessionManager.wsUrl()
 }

@@ -3,6 +3,7 @@ package com.lakshay.vitalink
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
@@ -14,6 +15,7 @@ import com.lakshay.vitalink.ui.LoginScreen
 import com.lakshay.vitalink.ui.MonitorScreen
 import com.lakshay.vitalink.ui.theme.VitaLinkTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
