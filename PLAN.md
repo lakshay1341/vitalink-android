@@ -21,7 +21,7 @@ optional per step; full end-to-end retest at the end.
   `Backend` object's singletons once provided (keep `token`/`baseUrl` holder or move to a
   SessionManager). Compile.
 
-- [ ] **A2 — Repository layer.** `VitaLinkRepository` interface + `VitaLinkRepositoryImpl`
+- [x] **A2 — Repository layer.** `VitaLinkRepository` interface + `VitaLinkRepositoryImpl`
   (@Inject) wrapping the API calls (encounters, news2, latestVitals, alerts, authenticate) and
   `WaveformStomp`. Returns domain results / `Result<T>`. Provided via Hilt. This is the seam the
   ViewModels depend on. Compile.
@@ -71,3 +71,4 @@ optional per step; full end-to-end retest at the end.
 ## Progress log
 (append one line per completed step)
 - A1 done — Hilt DI: hilt+ksp plugins, @HiltAndroidApp VitaLinkApp, @AndroidEntryPoint MainActivity, SessionManager (single source for baseUrl/token), NetworkModule (Moshi/OkHttp/Retrofit/VitaLinkApi, dynamic base-url via interceptor). Backend kept as delegating shim. kspDebugKotlin + compile pass.
+- A2 done — VitaLinkRepository interface (domain) + VitaLinkRepositoryImpl (@Inject, Result<T> via runCatching, waveform Flow) + RepositoryModule (@Binds). Compiles.
