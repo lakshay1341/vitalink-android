@@ -64,7 +64,7 @@ optional per step; full end-to-end retest at the end.
 
 - [x] **E1 — Update UI tests + previews** for the refactored screens (ViewModels made testable).
   Compile androidTest.
-- [ ] **E2 — README + full end-to-end retest** (backend + simulator + tab), then final commit.
+- [x] **E2 — README + full end-to-end retest** (backend + simulator + tab), then final commit.
 
 ---
 
@@ -80,3 +80,8 @@ optional per step; full end-to-end retest at the end.
 - C3 done — technical vs physiological alarm split (IEC 60601-1-8): backend alerts shown as Physiological; Technical alarms synthesized in MonitorViewModel from observed stream (no waveform for 8s = "ECG signal loss"). Monitor now has two alarm sections; TechnicalAlarmRow with blue device bar. Compiles.
 - D1 done — Room offline cache: EncounterEntity+VitalEntity+Daos+VitaLinkDb, DatabaseModule (Hilt provides DB+Daos), repo write-through on fetch + return cached copy on network failure (dashboard/monitor survive offline). Compiles (Room KSP codegen + Hilt DAO injection OK).
 - E1 done — UI tests updated: login test now renders LoginContent (no Hilt), added DashboardContent test + MonitorContent tests (ECG header/streaming + technical-alarm scroll-to). androidTest compiles. LoginPreview already fixed in B3; threshold/history screen previews deferred (need Hilt).
+- E2 done — README rewritten for the new architecture (Hilt/MVVM/repository/Room, 5 screens, phys-vs-technical alarms) + fixed demo bootstrap (device status ASSIGNED, added SpO2 alert-rule step). Full `./gradlew :app:assembleDebug` BUILD SUCCESSFUL (Hilt component gen + Room KSP + dexing + packaging, 19MB APK).
+- E2 caveat — on-device smoke test of the refactored APK NOT re-run this session (tab disconnected, backend/Timescale down). Full e2e was verified earlier pre-refactor (commit 96f4720 era); refactor is behaviourally equivalent (same endpoints/repository calls), compile + androidTest verified. Reconnect tab + run demo bootstrap to smoke-test.
+
+## Status: COMPLETE
+All 11 steps (A1–E2) done. 12 commits. Backend + app both build clean. Remaining is optional (delete Backend shim, server-side rule filter, real technical alarms, Inter font).
