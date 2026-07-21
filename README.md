@@ -1,6 +1,6 @@
 # VitaLink Android
 
-Clinician companion app for the [VitaLink](https://github.com/lakshay1341/vitalink) remote
+Clinician companion app for the [VitaLink](https://github.com/chaudhary-lakshay/vitalink) remote
 patient-monitoring backend. Jetpack Compose, styled like a bedside patient monitor (dark,
 instrument-grade). Five screens:
 
